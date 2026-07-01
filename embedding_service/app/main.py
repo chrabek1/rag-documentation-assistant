@@ -3,8 +3,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from app.model import model
-from app.schemas.embedding import EmbedRequest, EmbedResponse
-from app.services.qdrant import ensure_collection_exists
+from app.schemas.embedding import EmbedRequest, EmbedResponse, IndexTextRequest, IndexTextResponse
+from app.services.qdrant import ensure_collection_exists, index_text
 
 
 @asynccontextmanager
@@ -34,4 +34,21 @@ def embed(request: EmbedRequest):
     return EmbedResponse(
         dimension=len(embedding),
         embedding=embedding,
+    )
+    
+@app.post("/index-text", response_model=IndexTextResponse)
+def index_text_endpoint(request: IndexTextRequest):
+    embedding = model.encode(request.text).tolist()
+    
+    point_id = index_text(
+        text=request.text,
+        vector=embedding,
+        source=request.source,
+        section=request.section,
+        chunk=request.chunk,
+    )
+    
+    return IndexTextResponse(
+        id=point_id,
+        status="indexed",
     )
