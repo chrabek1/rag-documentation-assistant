@@ -1,9 +1,22 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
-from app.schemas.embedding import EmbedRequest, EmbedResponse
 
 from app.model import model
+from app.schemas.embedding import EmbedRequest, EmbedResponse
+from app.services.qdrant import ensure_collection_exists
 
-app = FastAPI(title="Embedding Service")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    ensure_collection_exists()
+    yield
+
+app = FastAPI(
+    title="Embedding Service",
+    lifespan=lifespan,
+    )
+
 
 @app.get("/")
 def health_check():
@@ -12,6 +25,7 @@ def health_check():
         "service": "embedding",
         "model_loaded": model is not None,
     }
+    
     
 @app.post("/embed", response_model=EmbedResponse)
 def embed(request: EmbedRequest):
