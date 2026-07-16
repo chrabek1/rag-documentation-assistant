@@ -1,0 +1,5 @@
+Docker is an open platform for developing, shipping, and running applications.
+
+Docker enables developers to separate applications from infrastructure.
+
+Containers are lightweight and portable.

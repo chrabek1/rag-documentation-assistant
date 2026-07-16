@@ -1,7 +1,16 @@
-def chunk_text(text: str, chunk_size: int) -> list[str]:
-    chunks = []
+from app.chunking.base.base_chunker import BaseChunker
+
+
+class CharacterChunker(BaseChunker):
+
+    def __init__(self, chunk_size: int):
+        self.chunk_size = chunk_size
     
-    for i in range(0, len(text), chunk_size):
-        chunks.append(text[i:i + chunk_size])
+    def chunk(self, text: str) -> list[str]:
         
-    return chunks
+        chunks = []
+        
+        for i in range(0, len(text), self.chunk_size):
+            chunks.append(text[i:i + self.chunk_size])
+            
+        return chunks
