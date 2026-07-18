@@ -1,4 +1,5 @@
-from app.chunking.base.base_chunker import BaseChunker
+from backend.app.chunking.base.base_chunker import BaseChunker
+from app.models.chunk import Chunk
 
 
 class TokenChunker(BaseChunker):
@@ -21,12 +22,12 @@ class TokenChunker(BaseChunker):
         self.chunk_size = chunk_size
         self.overlap = overlap
         
-    def chunk(self, text: str) -> list[str]:
+    def chunk(self, text: str) -> list[Chunk]:
         token_ids = self.tokenizer.encode(text, add_special_tokens=False)
         chunks = []
         step = self.chunk_size - self.overlap
 
-        for i in range(0, len(token_ids), step):
+        for chunk_index, i in enumerate(range(0, len(token_ids), step)):
             if i + self.overlap >= len(token_ids):
                 break
             chunk_token_ids = token_ids[i:i + self.chunk_size]
@@ -34,6 +35,11 @@ class TokenChunker(BaseChunker):
                 chunk_token_ids,
                 skip_special_tokens=True,
             )
-            chunks.append(chunk)
+            chunks.append(
+                Chunk(
+                    text=chunk,
+                    index=chunk_index,
+                )
+            )
             
         return chunks

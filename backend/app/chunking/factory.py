@@ -1,8 +1,8 @@
-from app.chunking.character_chunker import CharacterChunker
-from app.chunking.word_chunker import WordChunker
-from app.chunking.sentence_chunker import SentenceChunker
-from app.chunking.paragraph_chunker import ParagraphChunker
-from app.chunking.token_chunker import TokenChunker
+from backend.app.chunking.character_chunker import CharacterChunker
+from backend.app.chunking.word_chunker import WordChunker
+from backend.app.chunking.sentence_chunker import SentenceChunker
+from backend.app.chunking.paragraph_chunker import ParagraphChunker
+from backend.app.chunking.token_chunker import TokenChunker
 
 
 class ChunkerFactory:

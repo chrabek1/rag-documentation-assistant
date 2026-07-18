@@ -1,19 +1,21 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
+
 
 class EmbedRequest(BaseModel):
-    text: str
+    texts: list[str] = Field(
+        min_length=1,
+        max_length=1000,
+    )
+    
+    @field_validator("texts")
+    @classmethod
+    def validate_texts(cls, texts: list[str]) -> list[str]:
+        if any(not text.strip() for text in texts):
+            raise ValueError("Texts cannot contain empty strings.")
+        
+        return texts
+    
     
 class EmbedResponse(BaseModel):
-    dimension: int
-    embedding: list[float]
-    
-class IndexTextRequest(BaseModel):
-    text: str
-    source: str = "manual"
-    section: str = "unknown"
-    chunk: int = 0
-    
-class IndexTextResponse(BaseModel):
-    id: str
-    status: str
+    vectors: list[list[float]]
     

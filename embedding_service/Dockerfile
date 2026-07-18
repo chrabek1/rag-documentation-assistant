@@ -4,10 +4,9 @@ WORKDIR /app
 
 COPY requirements.txt .
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --timeout 1000 -r requirements.txt
 
 COPY app ./app
-COPY scripts ./scripts
 
 EXPOSE 8001
 

@@ -1,54 +1,17 @@
-from contextlib import asynccontextmanager
-
 from fastapi import FastAPI
 
-from app.model import model
-from app.schemas.embedding import EmbedRequest, EmbedResponse, IndexTextRequest, IndexTextResponse
-from app.services.qdrant import ensure_collection_exists, index_text
+from app.api.embedding import router as embedding_router
+from app.core.config import settings
+
+app = FastAPI(title="Embedding Service")
+
+app.include_router(embedding_router)
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    ensure_collection_exists()
-    yield
-
-app = FastAPI(
-    title="Embedding Service",
-    lifespan=lifespan,
-    )
-
-
-@app.get("/")
+@app.get("/health")
 def health_check():
     return {
         "status": "ok",
         "service": "embedding",
-        "model_loaded": model is not None,
+        "model": settings.embedding_model
     }
-    
-    
-@app.post("/embed", response_model=EmbedResponse)
-def embed(request: EmbedRequest):
-    embedding = model.encode(request.text).tolist()
-    
-    return EmbedResponse(
-        dimension=len(embedding),
-        embedding=embedding,
-    )
-    
-@app.post("/index-text", response_model=IndexTextResponse)
-def index_text_endpoint(request: IndexTextRequest):
-    embedding = model.encode(request.text).tolist()
-    
-    point_id = index_text(
-        text=request.text,
-        vector=embedding,
-        source=request.source,
-        section=request.section,
-        chunk=request.chunk,
-    )
-    
-    return IndexTextResponse(
-        id=point_id,
-        status="indexed",
-    )
