@@ -1,4 +1,6 @@
 fastapi
 uvicorn[standard]
+qdrant-client
 pydantic-settings
 pytest
+httpx

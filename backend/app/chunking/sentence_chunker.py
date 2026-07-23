@@ -1,24 +1,15 @@
 import re
 
-from backend.app.chunking.base.base_chunker import BaseChunker
+from app.chunking.base.base_chunker import BaseChunker
 from app.models.chunk import Chunk
 
+
 class SentenceChunker(BaseChunker):
+    
     def __init__(self, chunk_size: int, overlap: int = 0):
-        if chunk_size <= 0:
-            raise ValueError("chunk_size must be greater than 0")
-        
-        if overlap < 0:
-            raise ValueError("overlap cannot be negative")
-        
-        if overlap >= chunk_size:
-            raise ValueError("overlap must be smaller than chunk_size")
-        
-        self.chunk_size = chunk_size
-        self.overlap = overlap
+        super().__init__(chunk_size, overlap)
 
-
-    def chunk(self, text: str) -> list[Chunk]:
+    def chunk(self, text: str, document: str) -> list[Chunk]:
         sentences = re.split(r"(?<=[.!?])\s+", text)
         chunks = []
         step = self.chunk_size - self.overlap
@@ -30,6 +21,7 @@ class SentenceChunker(BaseChunker):
                 Chunk(
                     text=" ".join(chunk_sentences),
                     index=len(chunks),
+                    document=document,
                     )
                 )
             

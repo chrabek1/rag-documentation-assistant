@@ -1,13 +1,13 @@
-from backend.app.chunking.base.base_chunker import BaseChunker
+from app.chunking.base.base_chunker import BaseChunker
 from app.models.chunk import Chunk
 
 
 class CharacterChunker(BaseChunker):
 
-    def __init__(self, chunk_size: int):
-        self.chunk_size = chunk_size
+    def __init__(self, chunk_size: int, overlap: int = 0):
+        super().__init__(chunk_size, overlap)
     
-    def chunk(self, text: str) -> list[Chunk]:
+    def chunk(self, text: str, document: str) -> list[Chunk]:
         
         chunks = []
         
@@ -16,6 +16,7 @@ class CharacterChunker(BaseChunker):
                 Chunk(
                     text=text[i:i + self.chunk_size],
                     index=len(chunks),
+                    document=document,
                 )
             )
             

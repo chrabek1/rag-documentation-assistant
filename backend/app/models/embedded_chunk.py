@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from backend.app.models.chunk import Chunk
+from app.models.chunk import Chunk
 
 @dataclass
 class EmbeddedChunk:

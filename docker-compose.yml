@@ -11,6 +11,20 @@ services:
 
     depends_on:
       - qdrant
+      - embedding-service
+
+    volumes:
+      - ./backend:/app
+      - ./data:/data
+
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    restart: unless-stopped
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
   embedding-service:
     build: ./embedding_service
@@ -24,7 +38,16 @@ services:
 
     volumes:
       - ./embedding_service:/app
-      - ./data:/data:ro
+
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    restart: unless-stopped
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
+
   qdrant:
     image: qdrant/qdrant:latest
     container_name: rag-qdrant
@@ -34,6 +57,8 @@ services:
 
     volumes:
       - qdrant_storage:/qdrant/storage
+
+    restart: unless-stopped
 
 volumes:
   qdrant_storage:

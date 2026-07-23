@@ -1,4 +1,4 @@
-from backend.app.chunking.base.base_chunker import BaseChunker
+from app.chunking.base.base_chunker import BaseChunker
 from app.models.chunk import Chunk
 
 
@@ -9,20 +9,10 @@ class TokenChunker(BaseChunker):
         chunk_size: int,
         overlap: int = 0,
     ):
-        if chunk_size <= 0:
-            raise ValueError("chunk_size must be greater than 0")
-        
-        if overlap < 0:
-            raise ValueError("overlap cannot be negative")
-        
-        if overlap >= chunk_size:
-            raise ValueError("overlap must be smaller than chunk_size")
-        
         self.tokenizer = tokenizer
-        self.chunk_size = chunk_size
-        self.overlap = overlap
+        super().__init__(chunk_size,overlap)
         
-    def chunk(self, text: str) -> list[Chunk]:
+    def chunk(self, text: str, document: str) -> list[Chunk]:
         token_ids = self.tokenizer.encode(text, add_special_tokens=False)
         chunks = []
         step = self.chunk_size - self.overlap
@@ -39,6 +29,7 @@ class TokenChunker(BaseChunker):
                 Chunk(
                     text=chunk,
                     index=chunk_index,
+                    document=document,
                 )
             )
             
